@@ -1,22 +1,28 @@
 import requests
 import json
 
-import ipfshttpclient
 
 def pin_to_ipfs(data):
     assert isinstance(data, dict), "Error pin_to_ipfs expects a dictionary"
     
-    # Convert the dictionary to a JSON string
-    json_data = json.dumps(data)
+    url = "https://api.pinata.cloud/pinning/pinJSONToIPFS"
+
+    headers = {
+        "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJhMmVkNTQyNC1kYTRlLTQ3MzktYTViYS1jOWRiYmJiYTBlZjkiLCJlbWFpbCI6InR5aHVAc2Vhcy51cGVubi5lZHUiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiYWVkNzYxMDE2ODdjM2M3ZjBlYjkiLCJzY29wZWRLZXlTZWNyZXQiOiI3MTVmNjJmNGRhY2U1OTgxNTE0ZTNkYjE0NDA3NTAwMjBiOTdiMDhmOWRkNDNmNTRiOWZhZmVkMDU2ZDlmNDE4IiwiZXhwIjoxNzczNzk3NDg0fQ.6cjBFsCWImyuZXwwhWETG51mCoLDZXqzb4zfUxm1QtA",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "pinataContent": data
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
+    response.raise_for_status()
     
-    # Connect to the local IPFS node (default address)
-    with ipfshttpclient.connect() as client:
-        # Add the JSON data to IPFS
-        res = client.add_json(json_data)
-        
-    # The CID is returned after adding
-    cid = res
+    cid = response.json()['IpfsHash']
     return cid
+
+
 
 
 
