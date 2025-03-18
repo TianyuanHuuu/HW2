@@ -4,23 +4,19 @@ import json
 def pin_to_ipfs(data):
     assert isinstance(data, dict), f"Error pin_to_ipfs expects a dictionary"
     
-    # Pin JSON data to IPFS via Pinata API (no ipfs client required)
-    url = "https://api.pinata.cloud/pinning/pinJSONToIPFS"
+    json_data = json.dumps(data)
+    url = "https://ipfs.infura.io:5001/api/v0/add"
     
-    headers = {
-        "Content-Type": "application/json"
-        # "Authorization": f"Bearer {PINATA_JWT}"  # Uncomment if needed later
+    files = {
+        'file': ('data.json', json_data)
     }
     
-    payload = {
-        "pinataContent": data
-    }
-    
-    response = requests.post(url, headers=headers, json=payload)
+    response = requests.post(url, files=files)
     response.raise_for_status()
     
-    cid = response.json()['IpfsHash']
+    cid = response.json()["Hash"]
     return cid
+
 
 def get_from_ipfs(cid, content_type="json"):
     assert isinstance(cid, str), f"get_from_ipfs accepts a cid in the form of a string"
