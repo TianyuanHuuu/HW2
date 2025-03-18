@@ -1,21 +1,23 @@
 import requests
 import json
 
+import ipfshttpclient
+
 def pin_to_ipfs(data):
-    assert isinstance(data, dict), f"Error pin_to_ipfs expects a dictionary"
+    assert isinstance(data, dict), "Error pin_to_ipfs expects a dictionary"
     
+    # Convert the dictionary to a JSON string
     json_data = json.dumps(data)
-    url = "https://ipfs.infura.io:5001/api/v0/add"
     
-    files = {
-        'file': ('data.json', json_data)
-    }
-    
-    response = requests.post(url, files=files)
-    response.raise_for_status()
-    
-    cid = response.json()["Hash"]
+    # Connect to the local IPFS node (default address)
+    with ipfshttpclient.connect() as client:
+        # Add the JSON data to IPFS
+        res = client.add_json(json_data)
+        
+    # The CID is returned after adding
+    cid = res
     return cid
+
 
 
 def get_from_ipfs(cid, content_type="json"):
